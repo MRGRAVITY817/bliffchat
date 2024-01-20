@@ -12,7 +12,8 @@
       (biff/form
        {:action "/auth/signout"
         :class "inline"}
-       [:button.text-blue-500.hover:text-blue-800 {:type "submit"}
+       [:button.text-blue-500.hover:text-blue-800
+        {:type "submit"}
         "Sign out"])
       "."]
      [:.h-6]
