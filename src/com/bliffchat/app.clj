@@ -16,12 +16,36 @@
         "Sign out"])
       "."]
      [:.h-6]
-     [:div "Thanks for joining the waitlist. "
-      "We'll let you know when bliffchat is ready to use."])))
+     (biff/form
+      {:action "/community"}
+      [:button.btn {:type "submit"} "New community"]))))
+
+(defn new-community [{:keys [session] :as ctx}]
+  (let [comm-id (random-uuid)]
+    (biff/submit-tx
+     ctx
+     [{:db/doc-type  :community
+       :xt/id        comm-id
+       :comm/title   (str "Community #" (rand-int 1000))}
+      {:db/doc-type  :membership
+       :mem/user     (:uid session)
+       :mem/comm     comm-id
+       :mem/roles    #{:admin}}])
+    {:status 303
+     :headers {"Location" (str "/community/" comm-id)}}))
+
+(defn community [{:keys [biff/db path-params] :as ctx}]
+  (if-some [comm (xt/entity db (parse-uuid (:id path-params)))]
+    (ui/page {}
+             [:p "Welcome to " (:comm/title comm)])
+    {:status 303
+     :headers {"location" "/app"}}))
 
 (def plugin
-  {:routes ["/app" {:middleware [mid/wrap-signed-in]}
-            ["" {:get app}]]})
+  {:routes ["" {:middleware [mid/wrap-signed-in]}
+            ["/app"           {:get app}]
+            ["/community"     {:post new-community}]
+            ["/community/:id" {:get community}]]})
 
 
 
