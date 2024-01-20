@@ -3,7 +3,6 @@
             [com.bliffchat.email :as email]
             [com.bliffchat.app :as app]
             [com.bliffchat.home :as home]
-            [com.bliffchat.worker :as worker]
             [com.bliffchat.schema :as schema]
             [clojure.test :as test]
             [clojure.tools.logging :as log]
@@ -16,8 +15,7 @@
   [app/plugin
    (biff/authentication-plugin {})
    home/plugin
-   schema/plugin
-   worker/plugin])
+   schema/plugin])
 
 (def routes [["" {:middleware [biff/wrap-site-defaults]}
               (keep :routes plugins)]
@@ -29,7 +27,7 @@
 
 (def static-pages (apply biff/safe-merge (map :static plugins)))
 
-(defn generate-assets! [ctx]
+(defn generate-assets! [_ctx]
   (biff/export-rum static-pages "target/resources/public")
   (biff/delete-old-files {:dir "target/resources/public"
                           :exts [".html"]}))
